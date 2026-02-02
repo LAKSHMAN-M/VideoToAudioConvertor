@@ -5,21 +5,27 @@ using System.Diagnostics;
 using Whisper.net;
 using Whisper.net.Ggml;
 
-var builder = WebApplication.CreateBuilder(args);
+try
+{
+    Console.WriteLine("Starting application...");
+    
+    var builder = WebApplication.CreateBuilder(args);
 
-// Configure detailed logging
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-builder.Logging.SetMinimumLevel(LogLevel.Debug);
+    // Configure detailed logging
+    builder.Logging.ClearProviders();
+    builder.Logging.AddConsole();
+    builder.Logging.AddDebug();
+    builder.Logging.SetMinimumLevel(LogLevel.Debug);
+    
+    Console.WriteLine("Logging configured...");
 
 // Add services to the container.
-builder.Services.AddControllers();
+    Console.WriteLine("Adding services...");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add CORS support
-builder.Services.AddCors(options =>
+    Console.WriteLine("Configuring CORS...");
 {
     options.AddDefaultPolicy(corsBuilder =>
     {
@@ -130,8 +136,22 @@ else
 
 logger.LogInformation("Application ready to accept requests");
 app.Run();
-
-static async Task<bool> CheckFFmpegAvailability()
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Application startup failed: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    
+    // Also try to log to a file in case console logging isn't working
+    try
+    {
+        var logPath = Path.Combine(Path.GetTempPath(), "startup_error.log");
+        await File.WriteAllTextAsync(logPath, $"Startup Error: {ex.Message}\nStack Trace: {ex.StackTrace}\nTime: {DateTime.UtcNow}");
+    }
+    catch { /* ignore file write errors */ }
+    
+    throw; // Re-throw to ensure the process exits with error code
+}
 {
     try
     {
