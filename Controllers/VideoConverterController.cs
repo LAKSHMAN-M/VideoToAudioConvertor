@@ -40,18 +40,39 @@ public class VideoConverterController : ControllerBase
     [HttpGet("diagnostics")]
     public async Task<IActionResult> GetDiagnostics()
     {
+        var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+        var azureInfo = isAzure ? new
+        {
+            SiteName = Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"),
+            ResourceGroup = Environment.GetEnvironmentVariable("WEBSITE_RESOURCE_GROUP"),
+            Region = Environment.GetEnvironmentVariable("REGION_NAME"),
+            SKU = Environment.GetEnvironmentVariable("WEBSITE_SKU"),
+            InstanceId = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID")
+        } : null;
+
         var diagnostics = new
         {
+            Timestamp = DateTime.UtcNow,
             Environment = Environment.MachineName,
             Platform = Environment.OSVersion.ToString(),
             WorkingDirectory = Environment.CurrentDirectory,
             TempPath = Path.GetTempPath(),
+            IsAzureAppService = isAzure,
+            AzureInfo = azureInfo,
             FFmpegAvailable = await CheckFFmpegAvailability(),
+            RuntimeInfo = new
+            {
+                Version = Environment.Version.ToString(),
+                Is64Bit = Environment.Is64BitProcess,
+                ProcessorCount = Environment.ProcessorCount,
+                WorkingSet = Environment.WorkingSet
+            },
             EnvironmentVariables = new
             {
-                PATH = Environment.GetEnvironmentVariable("PATH"),
+                PATH = Environment.GetEnvironmentVariable("PATH")?.Substring(0, Math.Min(200, Environment.GetEnvironmentVariable("PATH")?.Length ?? 0)),
                 TEMP = Environment.GetEnvironmentVariable("TEMP"),
-                TMP = Environment.GetEnvironmentVariable("TMP")
+                TMP = Environment.GetEnvironmentVariable("TMP"),
+                WEBSITE_SITE_NAME = Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")
             }
         };
 
@@ -181,6 +202,22 @@ public class VideoConverterController : ControllerBase
             var inputPath = Path.GetTempFileName();
             var outputPath = Path.GetTempFileName() + $".{format}";
 
+            // Check if we're in Azure App Service
+            var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+            _logger.LogInformation($"Environment: {(isAzure ? "Azure App Service" : "Local/Other")}");
+
+            // Check FFmpeg availability first
+            var ffmpegAvailable = await CheckFFmpegAvailability();
+            if (!ffmpegAvailable)
+            {
+                var errorMsg = isAzure 
+                    ? "FFmpeg is not available in Azure App Service. Consider using Azure Container Apps or Media Services for video processing."
+                    : "FFmpeg is not available on this server. Please install FFmpeg to enable video processing.";
+                
+                _logger.LogError($"FFmpeg is not available. Environment: {(isAzure ? "Azure App Service" : "Local/Other")}");
+                return StatusCode(500, new { success = false, error = errorMsg, isAzureEnvironment = isAzure });
+            }
+
             try
             {
                 // Save uploaded file
@@ -253,6 +290,22 @@ public class VideoConverterController : ControllerBase
             var tempAudioPath = Path.GetTempFileName() + ".wav";
 
             _logger.LogInformation($"Created temp files - Input: {inputPath}, Audio: {tempAudioPath}");
+
+            // Check if we're in Azure App Service
+            var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+            _logger.LogInformation($"Environment: {(isAzure ? "Azure App Service" : "Local/Other")}");
+
+            // Check FFmpeg availability first
+            var ffmpegAvailable = await CheckFFmpegAvailability();
+            if (!ffmpegAvailable)
+            {
+                var errorMsg = isAzure 
+                    ? "FFmpeg is not available in Azure App Service. Consider using Azure Container Apps or Media Services for video processing."
+                    : "FFmpeg is not available on this server. Please install FFmpeg to enable video processing.";
+                
+                _logger.LogError($"FFmpeg is not available. Environment: {(isAzure ? "Azure App Service" : "Local/Other")}");
+                return StatusCode(500, new { success = false, error = errorMsg, isAzureEnvironment = isAzure });
+            }
 
             try
             {
