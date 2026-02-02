@@ -21,11 +21,14 @@ try
 
 // Add services to the container.
     Console.WriteLine("Adding services...");
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization();
 
 // Add CORS support
     Console.WriteLine("Configuring CORS...");
+builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(corsBuilder =>
     {
@@ -152,6 +155,8 @@ catch (Exception ex)
     
     throw; // Re-throw to ensure the process exits with error code
 }
+
+static async Task<bool> CheckFFmpegAvailability()
 {
     try
     {
@@ -163,15 +168,48 @@ catch (Exception ex)
                 Arguments = "-version",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             }
         };
+
+        var output = new System.Text.StringBuilder();
+        var error = new System.Text.StringBuilder();
+
+        process.OutputDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+                output.AppendLine(e.Data);
+        };
+
+        process.ErrorDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+                error.AppendLine(e.Data);
+        };
+
         process.Start();
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
         await process.WaitForExitAsync();
-        return process.ExitCode == 0;
+
+        var success = process.ExitCode == 0;
+        Console.WriteLine($"FFmpeg check - Exit code: {process.ExitCode}, Success: {success}");
+        
+        if (!success)
+        {
+            Console.WriteLine($"FFmpeg error output: {error}");
+        }
+        else
+        {
+            Console.WriteLine($"FFmpeg version info: {output.ToString().Split('\n')[0]}");
+        }
+
+        return success;
     }
-    catch
+    catch (Exception ex)
     {
+        Console.WriteLine($"Exception while checking FFmpeg availability: {ex.Message}");
         return false;
     }
 }
