@@ -1,5 +1,6 @@
 using FFMpegCore;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Features;
 using System.Diagnostics;
 using Whisper.net;
 using Whisper.net.Ggml;
@@ -49,8 +50,10 @@ builder.Services.Configure<IISServerOptions>(options =>
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 500 * 1024 * 1024; // 500 MB
-    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10); // 10 minutes
-    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10); // 10 minutes  
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(15); // 15 minutes
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(15); // 15 minutes
+    options.Limits.MaxConcurrentConnections = 100;
+    options.Limits.MaxConcurrentUpgradedConnections = 100;
 });
 
 // Configure request timeout
@@ -58,8 +61,18 @@ builder.Services.AddRequestTimeouts(options =>
 {
     options.DefaultPolicy = new Microsoft.AspNetCore.Http.Timeouts.RequestTimeoutPolicy
     {
-        Timeout = TimeSpan.FromMinutes(10) // 10 minutes for video processing
+        Timeout = TimeSpan.FromMinutes(15) // 15 minutes for video processing
     };
+});
+
+// Add additional configuration for Azure App Service
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 500 * 1024 * 1024; // 500 MB
+    options.ValueLengthLimit = int.MaxValue;
+    options.ValueCountLimit = int.MaxValue;
+    options.KeyLengthLimit = int.MaxValue;
+    options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
 var app = builder.Build();

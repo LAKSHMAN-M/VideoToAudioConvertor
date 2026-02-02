@@ -55,19 +55,39 @@ public class VideoConverterController : ControllerBase
 
     [HttpPost("audio")]
     [RequestSizeLimit(500 * 1024 * 1024)] // 500 MB
-    [RequestTimeout(600000)] // 10 minutes timeout (600,000 ms) for video processing
+    [RequestTimeout(900000)] // 15 minutes timeout (900,000 ms) for video processing
     public async Task<IActionResult> ConvertToAudio(IFormFile videoFile, [FromForm] string format = "mp3")
     {
+        _logger.LogInformation("ConvertToAudio endpoint called");
+        
         try
         {
             if (videoFile == null || videoFile.Length == 0)
+            {
+                _logger.LogWarning("No video file provided in request");
                 return BadRequest("No video file provided.");
+            }
+
+            _logger.LogInformation($"Received video file: {videoFile.FileName}, Size: {videoFile.Length} bytes ({videoFile.Length / (1024 * 1024)} MB)");
+
+            // Check file size limit (500 MB = 524,288,000 bytes)
+            if (videoFile.Length > 500 * 1024 * 1024)
+            {
+                _logger.LogWarning($"File too large: {videoFile.Length} bytes");
+                return BadRequest("File size exceeds 500 MB limit.");
+            }
 
             if (!IsValidVideoFile(videoFile.FileName))
+            {
+                _logger.LogWarning($"Invalid video file format: {videoFile.FileName}");
                 return BadRequest("Invalid video file format.");
+            }
 
             if (!IsValidAudioFormat(format))
+            {
+                _logger.LogWarning($"Invalid audio format requested: {format}");
                 return BadRequest("Invalid audio format. Supported: mp3, wav, aac, flac, ogg");
+            }
 
             // Create temporary files
             var inputPath = Path.GetTempFileName();
@@ -112,7 +132,7 @@ public class VideoConverterController : ControllerBase
 
     [HttpPost("text")]
     [RequestSizeLimit(500 * 1024 * 1024)] // 500 MB
-    [RequestTimeout(600000)] // 10 minutes timeout (600,000 ms) for video processing
+    [RequestTimeout(900000)] // 15 minutes timeout (900,000 ms) for video processing
     public async Task<IActionResult> ConvertToText(IFormFile videoFile)
     {
         _logger.LogInformation("ConvertToText endpoint called");
@@ -125,7 +145,14 @@ public class VideoConverterController : ControllerBase
                 return BadRequest("No video file provided.");
             }
 
-            _logger.LogInformation($"Received video file: {videoFile.FileName}, Size: {videoFile.Length} bytes");
+            _logger.LogInformation($"Received video file: {videoFile.FileName}, Size: {videoFile.Length} bytes ({videoFile.Length / (1024 * 1024)} MB)");
+
+            // Check file size limit (500 MB = 524,288,000 bytes)
+            if (videoFile.Length > 500 * 1024 * 1024)
+            {
+                _logger.LogWarning($"File too large: {videoFile.Length} bytes");
+                return BadRequest("File size exceeds 500 MB limit.");
+            }
 
             if (!IsValidVideoFile(videoFile.FileName))
             {
