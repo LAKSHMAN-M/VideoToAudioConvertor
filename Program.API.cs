@@ -6,6 +6,12 @@ using Whisper.net.Ggml;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure detailed logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -14,17 +20,25 @@ builder.Services.AddSwaggerGen();
 // Add CORS support
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    options.AddDefaultPolicy(corsBuilder =>
     {
-        builder.AllowAnyOrigin()
+        corsBuilder.AllowAnyOrigin()
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
 });
 
 // Get port from environment variable (for deployment)
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+    Console.WriteLine($"Using port from environment: {port}");
+}
+else
+{
+    Console.WriteLine("No PORT environment variable found, using default configuration");
+}
 
 // Configure file upload limits and timeouts
 builder.Services.Configure<IISServerOptions>(options =>
@@ -50,38 +64,58 @@ builder.Services.AddRequestTimeouts(options =>
 
 var app = builder.Build();
 
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Application starting up...");
+logger.LogInformation($"Environment: {app.Environment.EnvironmentName}");
+logger.LogInformation("CORS configured to allow all origins");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    logger.LogInformation("Swagger UI enabled for development environment");
 }
 
-// Only use HTTPS redirection in production, not in development
-if (!app.Environment.IsDevelopment())
+// Use HTTPS redirection in production
+if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
+    logger.LogInformation("HTTPS redirection enabled for production");
 }
 
 // Enable static files FIRST - order matters!
 app.UseDefaultFiles();
 app.UseStaticFiles();
+logger.LogInformation("Static files middleware enabled");
 
 // Enable request timeouts
 app.UseRequestTimeouts();
+logger.LogInformation("Request timeouts configured");
 
 // Enable CORS
 app.UseCors();
+logger.LogInformation("CORS middleware enabled");
 
 app.UseAuthorization();
 app.MapControllers();
 
+// Log mapped endpoints
+logger.LogInformation("API Controllers mapped and ready");
+
 // Check FFmpeg availability on startup
+logger.LogInformation("Checking FFmpeg availability...");
 if (!await CheckFFmpegAvailability())
 {
+    logger.LogWarning("FFmpeg is not found. Video conversion will not work properly.");
     Console.WriteLine("Warning: FFmpeg is not found. Install FFmpeg for the API to work properly.");
 }
+else
+{
+    logger.LogInformation("FFmpeg is available and ready for video processing");
+}
 
+logger.LogInformation("Application ready to accept requests");
 app.Run();
 
 static async Task<bool> CheckFFmpegAvailability()
