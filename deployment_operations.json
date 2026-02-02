@@ -1,0 +1,220 @@
+[
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/77AE1BF9C510BD08",
+    "operationId": "77AE1BF9C510BD08",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:08:31.0269839Z",
+      "duration": "PT15.7843123S",
+      "trackingId": "4c8f428e-049c-46ee-84cd-7b512bf23429",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Web/sites/VideoToAudioConvertor/sourcecontrols/web",
+        "resourceType": "Microsoft.Web/sites/sourcecontrols",
+        "resourceName": "VideoToAudioConvertor/web"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/CA834F2E7A45BA1B",
+    "operationId": "CA834F2E7A45BA1B",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:08:27.48423Z",
+      "duration": "PT41.3937588S",
+      "trackingId": "5e1a5491-b2ae-422b-8767-8c7ae9599680",
+      "statusCode": "Created",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.ManagedIdentity/userAssignedIdentities/identity-VideoToAudioConvertor/federatedIdentityCredentials/fgjxgi6uigiyw",
+        "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials",
+        "resourceName": "identity-VideoToAudioConvertor/fgjxgi6uigiyw"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/5D9F22FE348E253D",
+    "operationId": "5D9F22FE348E253D",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:08:30.4468081Z",
+      "duration": "PT3.6598811S",
+      "trackingId": "67dc4ba8-4a2e-4fbc-8443-719de7bcdb41",
+      "statusCode": "Created",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.web/sites/VideoToAudioConvertor/providers/Microsoft.Authorization/roleAssignments/b15affba-bd66-599b-bb6d-19d168d340da",
+        "resourceType": "Microsoft.Authorization/roleAssignments",
+        "resourceName": "b15affba-bd66-599b-bb6d-19d168d340da"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/F495DD15CCA28CA3",
+    "operationId": "F495DD15CCA28CA3",
+    "properties": {
+      "provisioningOperation": "Read",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:08:30.4468081Z",
+      "duration": "PT0.5346917S",
+      "trackingId": "f106575a-9cf1-4e37-abeb-a8cf8760658e",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.ManagedIdentity/userAssignedIdentities/identity-VideoToAudioConvertor",
+        "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "resourceName": "identity-VideoToAudioConvertor",
+        "apiVersion": "2018-11-30"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/C33245C9C75B36A5",
+    "operationId": "C33245C9C75B36A5",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:08:27.48423Z",
+      "duration": "PT2.9034418S",
+      "trackingId": "c7dc4cc1-e45c-4c73-8895-b65abaa0208b",
+      "statusCode": "Created",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.ManagedIdentity/userAssignedIdentities/identity-VideoToAudioConvertor",
+        "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "resourceName": "identity-VideoToAudioConvertor"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/8D51FBCA6EC854A1",
+    "operationId": "8D51FBCA6EC854A1",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:08:27.48423Z",
+      "duration": "PT0.4190511S",
+      "trackingId": "fdac0a86-be3f-4ed2-9a7b-227d657a4def",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Web/sites/VideoToAudioConvertor/basicPublishingCredentialsPolicies/ftp",
+        "resourceType": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+        "resourceName": "VideoToAudioConvertor/ftp"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/75E61A85C8928059",
+    "operationId": "75E61A85C8928059",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:07:59.8590055Z",
+      "duration": "PT28.0128778S",
+      "trackingId": "b518930d-3df8-4c94-94ab-a529b9236358",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Web/sites/VideoToAudioConvertor/basicPublishingCredentialsPolicies/scm",
+        "resourceType": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+        "resourceName": "VideoToAudioConvertor/scm"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/3C3707FFC6E7D4EF",
+    "operationId": "3C3707FFC6E7D4EF",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:07:59.8590055Z",
+      "duration": "PT27.5753579S",
+      "trackingId": "66ca9a42-89d0-4449-a585-01044daf8c54",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Web/sites/VideoToAudioConvertor",
+        "resourceType": "Microsoft.Web/sites",
+        "resourceName": "VideoToAudioConvertor"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/62FF43C47E387C6B",
+    "operationId": "62FF43C47E387C6B",
+    "properties": {
+      "provisioningOperation": "Read",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:06:08.7675378Z",
+      "duration": "PT1M51.0402341S",
+      "trackingId": "4b2cff60-5862-457f-805e-00314ba40738",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/microsoft.insights/components/appinsights-VideoToAudioConvertor",
+        "resourceType": "microsoft.insights/components",
+        "resourceName": "appinsights-VideoToAudioConvertor",
+        "apiVersion": "2015-05-01"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/F3BBFDD33843A74D",
+    "operationId": "F3BBFDD33843A74D",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:06:08.7675378Z",
+      "duration": "PT1M50.9464795S",
+      "trackingId": "e2490611-c173-49b6-ac85-592a9d805c99",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/microsoft.insights/components/appinsights-VideoToAudioConvertor",
+        "resourceType": "microsoft.insights/components",
+        "resourceName": "appinsights-VideoToAudioConvertor"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/99733BE7E564C0C7",
+    "operationId": "99733BE7E564C0C7",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:06:08.7675378Z",
+      "duration": "PT3.1177764S",
+      "trackingId": "5b6ab441-5387-48c3-9758-d23d6de04a26",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Web/serverfarms/plan-VideoToAudioConvertor",
+        "resourceType": "Microsoft.Web/serverfarms",
+        "resourceName": "plan-VideoToAudioConvertor"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/03603DFBE560E268",
+    "operationId": "03603DFBE560E268",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:06:08.7675378Z",
+      "duration": "PT1M46.3837815S",
+      "trackingId": "8dc40603-285c-4a24-8526-885e5846e73a",
+      "statusCode": "OK",
+      "targetResource": {
+        "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/newWorkspaceTemplate",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "newWorkspaceTemplate"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/5f447159-123a-423a-bcd0-d0922bcb11f9/resourceGroups/MyProjects/providers/Microsoft.Resources/deployments/deploy-VideoToAudioConvertor-1769767499057/operations/08584318393191539033",
+    "operationId": "08584318393191539033",
+    "properties": {
+      "provisioningOperation": "EvaluateDeploymentOutput",
+      "provisioningState": "Succeeded",
+      "timestamp": "2026-01-30T10:09:09.0601177Z",
+      "duration": "PT0.2710387S",
+      "trackingId": "9998ea74-7bc2-40af-ae0f-590bdc4c90fe",
+      "statusCode": "OK"
+    }
+  }
+]

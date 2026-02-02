@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "c:\\Assignments\\Assignments_2\\VideoToAudio\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.VideoToAudio.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.VideoToAudio.props",
+      "PackagePath": "build\\VideoToAudio.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.VideoToAudio.props",
+      "PackagePath": "buildMultiTargeting\\VideoToAudio.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.VideoToAudio.props",
+      "PackagePath": "buildTransitive\\VideoToAudio.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "qd9FAHqjj8XCy9vNkw1PBBpuGowHmnqmRKzAbvj964M=",
+  "Source": "VideoToAudio",
+  "BasePath": "_content/VideoToAudio",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "VideoToAudio\\wwwroot",
+      "Source": "VideoToAudio",
+      "ContentRoot": "c:\\Assignments\\Assignments_2\\VideoToAudio\\wwwroot\\",
+      "BasePath": "_content/VideoToAudio",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "c:\\Assignments\\Assignments_2\\VideoToAudio\\wwwroot\\index.html",
+      "SourceId": "VideoToAudio",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Assignments\\Assignments_2\\VideoToAudio\\wwwroot\\",
+      "BasePath": "_content/VideoToAudio",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    }
+  ]
+}

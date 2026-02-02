@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "defaultProvider": {
+    "provider": "kudu",
+    "config": {
+      "command": "dotnet VideoToAudioAPI.dll"
+    }
+  }
+}
