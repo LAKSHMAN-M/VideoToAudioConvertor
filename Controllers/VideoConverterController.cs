@@ -53,6 +53,72 @@ public class VideoConverterController : ControllerBase
         });
     }
 
+    [HttpPost("test-ffmpeg")]
+    public async Task<IActionResult> TestFFmpeg([FromForm] string filePath)
+    {
+        try
+        {
+            _logger.LogInformation($"Testing FFmpeg with file: {filePath}");
+            
+            if (!System.IO.File.Exists(filePath))
+            {
+                return BadRequest($"File not found: {filePath}");
+            }
+
+            var fileInfo = new FileInfo(filePath);
+            _logger.LogInformation($"File size: {fileInfo.Length} bytes");
+
+            // Test basic FFmpeg probe
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "ffmpeg",
+                    Arguments = $"-i \"{filePath}\" -t 1 -f null -",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            var output = new System.Text.StringBuilder();
+            var error = new System.Text.StringBuilder();
+
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    output.AppendLine(e.Data);
+            };
+
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    error.AppendLine(e.Data);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            await process.WaitForExitAsync();
+
+            return Ok(new
+            {
+                FilePath = filePath,
+                FileSize = fileInfo.Length,
+                ExitCode = process.ExitCode,
+                Output = output.ToString(),
+                Error = error.ToString(),
+                FFmpegSuccess = process.ExitCode == 0
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "FFmpeg test failed");
+            return StatusCode(500, $"FFmpeg test error: {ex.Message}");
+        }
+    }
+
     [HttpPost("audio")]
     [RequestSizeLimit(500 * 1024 * 1024)] // 500 MB
     [RequestTimeout(900000)] // 15 minutes timeout (900,000 ms) for video processing
@@ -292,14 +358,27 @@ public class VideoConverterController : ControllerBase
         {
             _logger.LogInformation($"Starting FFmpeg audio extraction from {inputPath} to {outputPath}");
             
+            // Check if input file exists
+            if (!System.IO.File.Exists(inputPath))
+            {
+                _logger.LogError($"Input file does not exist: {inputPath}");
+                return false;
+            }
+
+            var inputFileInfo = new FileInfo(inputPath);
+            _logger.LogInformation($"Input file size: {inputFileInfo.Length} bytes");
+
+            // Try with more robust FFmpeg arguments
             var arguments = FFMpegArguments.FromFileInput(inputPath)
                 .OutputToFile(outputPath, true, options => options
                     .WithAudioCodec("pcm_s16le")
                     .WithAudioSamplingRate(16000)
                     .WithCustomArgument("-ac 1")
                     .WithCustomArgument("-vn")
-                    .WithCustomArgument("-threads 0"));
+                    .WithCustomArgument("-threads 0")
+                    .WithCustomArgument("-loglevel verbose"));
 
+            _logger.LogInformation("Starting FFmpeg process...");
             var result = await arguments.ProcessAsynchronously();
             
             if (result)
@@ -309,6 +388,11 @@ public class VideoConverterController : ControllerBase
                 if (fileInfo.Exists)
                 {
                     _logger.LogInformation($"Output audio file created, size: {fileInfo.Length} bytes");
+                    if (fileInfo.Length == 0)
+                    {
+                        _logger.LogError("Output audio file is empty");
+                        return false;
+                    }
                 }
                 else
                 {
@@ -318,15 +402,75 @@ public class VideoConverterController : ControllerBase
             }
             else
             {
-                _logger.LogError("FFmpeg audio extraction failed");
+                _logger.LogError("FFmpeg audio extraction failed - process returned false");
             }
             
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Audio extraction failed");
-            return false;
+            _logger.LogError(ex, "Audio extraction failed with exception");
+            
+            // Try alternative approach with direct Process execution
+            try
+            {
+                _logger.LogInformation("Attempting alternative FFmpeg execution...");
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "ffmpeg",
+                        Arguments = $"-i \"{inputPath}\" -acodec pcm_s16le -ar 16000 -ac 1 -vn \"{outputPath}\" -y -loglevel error",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                var output = new System.Text.StringBuilder();
+                var error = new System.Text.StringBuilder();
+
+                process.OutputDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                        output.AppendLine(e.Data);
+                };
+
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                        error.AppendLine(e.Data);
+                };
+
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                await process.WaitForExitAsync();
+
+                _logger.LogInformation($"FFmpeg exit code: {process.ExitCode}");
+                if (output.Length > 0)
+                    _logger.LogInformation($"FFmpeg output: {output}");
+                if (error.Length > 0)
+                    _logger.LogError($"FFmpeg error: {error}");
+
+                if (process.ExitCode == 0 && System.IO.File.Exists(outputPath))
+                {
+                    var fileInfo = new FileInfo(outputPath);
+                    if (fileInfo.Length > 0)
+                    {
+                        _logger.LogInformation($"Alternative method succeeded, file size: {fileInfo.Length} bytes");
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception altEx)
+            {
+                _logger.LogError(altEx, "Alternative FFmpeg execution also failed");
+                return false;
+            }
         }
     }
 
