@@ -37,6 +37,28 @@ public class VideoConverterController : ControllerBase
         });
     }
 
+    [HttpGet("diagnostics")]
+    public async Task<IActionResult> GetDiagnostics()
+    {
+        var diagnostics = new
+        {
+            Environment = Environment.MachineName,
+            Platform = Environment.OSVersion.ToString(),
+            WorkingDirectory = Environment.CurrentDirectory,
+            TempPath = Path.GetTempPath(),
+            FFmpegAvailable = await CheckFFmpegAvailability(),
+            EnvironmentVariables = new
+            {
+                PATH = Environment.GetEnvironmentVariable("PATH"),
+                TEMP = Environment.GetEnvironmentVariable("TEMP"),
+                TMP = Environment.GetEnvironmentVariable("TMP")
+            }
+        };
+
+        _logger.LogInformation($"Diagnostics: {System.Text.Json.JsonSerializer.Serialize(diagnostics)}");
+        return Ok(diagnostics);
+    }
+
     [HttpGet("status")]
     public async Task<IActionResult> GetStatus()
     {
@@ -585,10 +607,12 @@ public class VideoConverterController : ControllerBase
         };
     }
 
-    private static async Task<bool> CheckFFmpegAvailability()
+    private async Task<bool> CheckFFmpegAvailability()
     {
         try
         {
+            _logger.LogInformation("Checking FFmpeg availability...");
+            
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -597,15 +621,48 @@ public class VideoConverterController : ControllerBase
                     Arguments = "-version",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     CreateNoWindow = true
                 }
             };
+
+            var output = new System.Text.StringBuilder();
+            var error = new System.Text.StringBuilder();
+
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    output.AppendLine(e.Data);
+            };
+
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    error.AppendLine(e.Data);
+            };
+
             process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
             await process.WaitForExitAsync();
-            return process.ExitCode == 0;
+
+            var success = process.ExitCode == 0;
+            _logger.LogInformation($"FFmpeg check - Exit code: {process.ExitCode}, Success: {success}");
+            
+            if (!success)
+            {
+                _logger.LogError($"FFmpeg error output: {error}");
+            }
+            else
+            {
+                _logger.LogInformation($"FFmpeg version info: {output.ToString().Split('\n')[0]}");
+            }
+
+            return success;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Exception while checking FFmpeg availability");
             return false;
         }
     }
