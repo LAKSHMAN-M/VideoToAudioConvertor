@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http.Timeouts;
+using VideoToAudio.Services;
 
 namespace VideoToAudio.Controllers;
 
@@ -214,11 +215,13 @@ public class VideoConverterController : ControllerBase
             if (!ffmpegAvailable)
             {
                 var errorMsg = isAzure 
-                    ? "FFmpeg is not available in Azure App Service. Consider using Azure Container Apps or Media Services for video processing."
+                    ? (FFmpegSetupService.IsFFmpegReady 
+                        ? "FFmpeg is downloaded but not working correctly. Check Azure App Service logs for details."
+                        : "FFmpeg is being set up in the background. Please try again in a few moments.")
                     : "FFmpeg is not available on this server. Please install FFmpeg to enable video processing.";
                 
-                _logger.LogError($"FFmpeg is not available. Environment: {(isAzure ? "Azure App Service" : "Local/Other")}");
-                return StatusCode(500, new { success = false, error = errorMsg, isAzureEnvironment = isAzure });
+                _logger.LogError($"FFmpeg is not available. Environment: {(isAzure ? "Azure App Service" : "Local/Other")}, Setup Complete: {FFmpegSetupService.IsFFmpegReady}");
+                return StatusCode(500, new { success = false, error = errorMsg, isAzureEnvironment = isAzure, ffmpegSetupComplete = FFmpegSetupService.IsFFmpegReady });
             }
 
             try
@@ -303,11 +306,13 @@ public class VideoConverterController : ControllerBase
             if (!ffmpegAvailable)
             {
                 var errorMsg = isAzure 
-                    ? "FFmpeg is not available in Azure App Service. Consider using Azure Container Apps or Media Services for video processing."
+                    ? (FFmpegSetupService.IsFFmpegReady 
+                        ? "FFmpeg is downloaded but not working correctly. Check Azure App Service logs for details."
+                        : "FFmpeg is being set up in the background. Please try again in a few moments.")
                     : "FFmpeg is not available on this server. Please install FFmpeg to enable video processing.";
                 
-                _logger.LogError($"FFmpeg is not available. Environment: {(isAzure ? "Azure App Service" : "Local/Other")}");
-                return StatusCode(500, new { success = false, error = errorMsg, isAzureEnvironment = isAzure });
+                _logger.LogError($"FFmpeg is not available. Environment: {(isAzure ? "Azure App Service" : "Local/Other")}, Setup Complete: {FFmpegSetupService.IsFFmpegReady}");
+                return StatusCode(500, new { success = false, error = errorMsg, isAzureEnvironment = isAzure, ffmpegSetupComplete = FFmpegSetupService.IsFFmpegReady });
             }
 
             try

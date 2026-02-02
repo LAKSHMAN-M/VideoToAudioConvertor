@@ -8,6 +8,7 @@ using Whisper.net.Ggml;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using VideoToAudio.Controllers;
+using VideoToAudio.Services;
 
 try
 {
@@ -23,35 +24,13 @@ try
     
     Console.WriteLine("Logging configured...");
 
-    // Configure FFmpeg for Azure App Service
+    // Configure FFmpeg for Azure App Service (non-blocking)
     Console.WriteLine("Configuring FFmpeg...");
     var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
     if (isAzure)
     {
-        Console.WriteLine("Azure environment detected, setting up FFmpeg...");
-        var ffmpegPath = Path.Combine(Path.GetTempPath(), "ffmpeg");
-        
-        try 
-        {
-            // Download FFmpeg binaries using Xabe.FFmpeg
-            Console.WriteLine($"Downloading FFmpeg to: {ffmpegPath}");
-            await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, ffmpegPath);
-            
-            // Set FFmpeg path for both libraries
-            GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegPath);
-            FFmpeg.SetExecutablesPath(ffmpegPath);
-            
-            // Set the path for our custom controller checks
-            VideoConverterController.SetFFmpegPath(ffmpegPath);
-            
-            Console.WriteLine("FFmpeg configured successfully for Azure");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"FFmpeg setup failed: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-            // Continue without FFmpeg - the error will be handled in the controllers
-        }
+        Console.WriteLine("Azure environment detected, will setup FFmpeg after startup...");
+        // Don't block startup with FFmpeg download - do it in background
     }
     else
     {
@@ -64,6 +43,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
+
+// Add FFmpeg setup background service
+builder.Services.AddHostedService<FFmpegSetupService>();
 
 // Add CORS support
     Console.WriteLine("Configuring CORS...");
