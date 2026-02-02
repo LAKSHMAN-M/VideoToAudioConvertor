@@ -14,6 +14,9 @@ namespace VideoToAudio.Controllers;
 public class VideoConverterController : ControllerBase
 {
     private readonly ILogger<VideoConverterController> _logger;
+    private static string? FFmpegPath = null;
+    public static void SetFFmpegPath(string path) => FFmpegPath = path;
+    
     private static readonly string[] AllowedVideoExtensions = { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm" };
 
     public VideoConverterController(ILogger<VideoConverterController> logger)
@@ -666,11 +669,29 @@ public class VideoConverterController : ControllerBase
         {
             _logger.LogInformation("Checking FFmpeg availability...");
             
+            // Determine the FFmpeg executable path
+            var ffmpegExecutable = "ffmpeg";
+            
+            // If we have a configured FFmpeg path (from Azure setup), use it
+            if (!string.IsNullOrEmpty(FFmpegPath))
+            {
+                var ffmpegExePath = Path.Combine(FFmpegPath, "ffmpeg.exe");
+                if (System.IO.File.Exists(ffmpegExePath))
+                {
+                    ffmpegExecutable = ffmpegExePath;
+                    _logger.LogInformation($"Using configured FFmpeg path: {ffmpegExecutable}");
+                }
+                else
+                {
+                    _logger.LogWarning($"Configured FFmpeg path not found: {ffmpegExePath}");
+                }
+            }
+            
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "ffmpeg",
+                    FileName = ffmpegExecutable,
                     Arguments = "-version",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,

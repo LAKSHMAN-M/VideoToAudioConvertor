@@ -7,6 +7,7 @@ using Whisper.net;
 using Whisper.net.Ggml;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
+using VideoToAudio.Controllers;
 
 try
 {
@@ -40,11 +41,15 @@ try
             GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegPath);
             FFmpeg.SetExecutablesPath(ffmpegPath);
             
+            // Set the path for our custom controller checks
+            VideoConverterController.SetFFmpegPath(ffmpegPath);
+            
             Console.WriteLine("FFmpeg configured successfully for Azure");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"FFmpeg setup failed: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             // Continue without FFmpeg - the error will be handled in the controllers
         }
     }
