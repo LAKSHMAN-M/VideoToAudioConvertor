@@ -1,9 +1,12 @@
 using FFMpegCore;
+using FFMpegCore.Enums;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
 using System.Diagnostics;
 using Whisper.net;
 using Whisper.net.Ggml;
+using Xabe.FFmpeg;
+using Xabe.FFmpeg.Downloader;
 
 try
 {
@@ -18,6 +21,37 @@ try
     builder.Logging.SetMinimumLevel(LogLevel.Debug);
     
     Console.WriteLine("Logging configured...");
+
+    // Configure FFmpeg for Azure App Service
+    Console.WriteLine("Configuring FFmpeg...");
+    var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+    if (isAzure)
+    {
+        Console.WriteLine("Azure environment detected, setting up FFmpeg...");
+        var ffmpegPath = Path.Combine(Path.GetTempPath(), "ffmpeg");
+        
+        try 
+        {
+            // Download FFmpeg binaries using Xabe.FFmpeg
+            Console.WriteLine($"Downloading FFmpeg to: {ffmpegPath}");
+            await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, ffmpegPath);
+            
+            // Set FFmpeg path for both libraries
+            GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegPath);
+            FFmpeg.SetExecutablesPath(ffmpegPath);
+            
+            Console.WriteLine("FFmpeg configured successfully for Azure");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FFmpeg setup failed: {ex.Message}");
+            // Continue without FFmpeg - the error will be handled in the controllers
+        }
+    }
+    else
+    {
+        Console.WriteLine("Local environment detected, FFmpeg should be available in PATH");
+    }
 
 // Add services to the container.
     Console.WriteLine("Adding services...");
