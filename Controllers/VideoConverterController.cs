@@ -115,37 +115,62 @@ public class VideoConverterController : ControllerBase
     [RequestTimeout(600000)] // 10 minutes timeout (600,000 ms) for video processing
     public async Task<IActionResult> ConvertToText(IFormFile videoFile)
     {
+        _logger.LogInformation("ConvertToText endpoint called");
+        
         try
         {
             if (videoFile == null || videoFile.Length == 0)
+            {
+                _logger.LogWarning("No video file provided in request");
                 return BadRequest("No video file provided.");
+            }
+
+            _logger.LogInformation($"Received video file: {videoFile.FileName}, Size: {videoFile.Length} bytes");
 
             if (!IsValidVideoFile(videoFile.FileName))
+            {
+                _logger.LogWarning($"Invalid video file format: {videoFile.FileName}");
                 return BadRequest("Invalid video file format.");
+            }
 
             // Create temporary files
             var inputPath = Path.GetTempFileName();
             var tempAudioPath = Path.GetTempFileName() + ".wav";
 
+            _logger.LogInformation($"Created temp files - Input: {inputPath}, Audio: {tempAudioPath}");
+
             try
             {
                 // Save uploaded file
+                _logger.LogInformation("Saving uploaded file to temporary location");
                 using (var stream = new FileStream(inputPath, FileMode.Create))
                 {
                     await videoFile.CopyToAsync(stream);
                 }
+                _logger.LogInformation($"File saved successfully, size: {new FileInfo(inputPath).Length} bytes");
 
-                _logger.LogInformation($"Converting {videoFile.FileName} to text");
+                _logger.LogInformation($"Starting conversion of {videoFile.FileName} to text");
 
                 // Extract audio
+                _logger.LogInformation("Extracting audio from video file");
                 var audioExtractionSuccess = await ExtractAudio(inputPath, tempAudioPath);
                 if (!audioExtractionSuccess)
+                {
+                    _logger.LogError("Audio extraction failed");
                     return StatusCode(500, "Audio extraction failed");
+                }
+                _logger.LogInformation("Audio extraction completed successfully");
 
                 // Convert to text using Whisper
+                _logger.LogInformation("Starting speech-to-text conversion using Whisper");
                 var transcription = await ConvertAudioToText(tempAudioPath);
                 if (transcription == null)
+                {
+                    _logger.LogError("Speech-to-text conversion returned null");
                     return StatusCode(500, "Speech-to-text conversion failed");
+                }
+                
+                _logger.LogInformation($"Transcription completed, result length: {transcription?.Length ?? 0} characters");
 
                 if (string.IsNullOrWhiteSpace(transcription))
                     transcription = "No speech detected in the audio file.";
@@ -238,6 +263,8 @@ public class VideoConverterController : ControllerBase
     {
         try
         {
+            _logger.LogInformation($"Starting FFmpeg audio extraction from {inputPath} to {outputPath}");
+            
             var arguments = FFMpegArguments.FromFileInput(inputPath)
                 .OutputToFile(outputPath, true, options => options
                     .WithAudioCodec("pcm_s16le")
@@ -246,7 +273,28 @@ public class VideoConverterController : ControllerBase
                     .WithCustomArgument("-vn")
                     .WithCustomArgument("-threads 0"));
 
-            return await arguments.ProcessAsynchronously();
+            var result = await arguments.ProcessAsynchronously();
+            
+            if (result)
+            {
+                _logger.LogInformation("FFmpeg audio extraction completed successfully");
+                var fileInfo = new FileInfo(outputPath);
+                if (fileInfo.Exists)
+                {
+                    _logger.LogInformation($"Output audio file created, size: {fileInfo.Length} bytes");
+                }
+                else
+                {
+                    _logger.LogError("Output audio file was not created despite success status");
+                    return false;
+                }
+            }
+            else
+            {
+                _logger.LogError("FFmpeg audio extraction failed");
+            }
+            
+            return result;
         }
         catch (Exception ex)
         {
